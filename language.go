@@ -9,6 +9,7 @@ import (
 type Language struct {
 	Code       string // ISO code of the language
 	NativeName string // native name of language
+	Name       *MultiLanguageString
 }
 
 // Equal reports whether two language are same.
@@ -31,6 +32,15 @@ func (l Languages) SortByCode() {
 	}
 
 	byCode.Sort(l)
+}
+
+// SortByName sorts the list by name with given language.
+func (l Languages) SortByName(language *Language) {
+	var byName LanguageLessFunc = func(c1, c2 *Language) bool {
+		return c1.Name.Value(language) < c2.Name.Value(language)
+	}
+
+	byName.Sort(l)
 }
 
 // languageSorter joins a LanguageLessFunc function and Languages to be sorted.
@@ -80,6 +90,7 @@ func init() {
 		language := &Language{
 			Code:       v,
 			NativeName: nativeName,
+			Name:       NewMultiLanguageString(),
 		}
 
 		languageTable[strings.ToLower(v)] = language
