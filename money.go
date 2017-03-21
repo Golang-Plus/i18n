@@ -44,7 +44,7 @@ func (m *Money) Format(formatter *CurrencyFormatter) string {
 
 // String returns the string of money (format: currency code + amount).
 func (m *Money) String() string {
-	return fmt.Sprintf("%s %f", m.Currency.Code, m.decimal)
+	return fmt.Sprintf("%s %f", m.Currency.Code, m.Amount)
 }
 
 // Add sets m.decimal to the sum of m.decimal and another and returns m.
