@@ -12,14 +12,10 @@ type Language struct {
 	Name       *MultiLanguageString
 }
 
-// Equal reports whether two language are same.
-// It compares the language codes.
-func (l *Language) Equal(another *Language) bool {
-	if another == nil {
-		return false
-	}
-
-	return strings.EqualFold(l.Code, another.Code)
+// Equal reports whether two languages are same.
+// It compares the code.
+func (x *Language) Equal(y *Language) bool {
+	return strings.EqualFold(x.Code, y.Code)
 }
 
 // Languages represents a sortable collection of Language.
@@ -103,15 +99,13 @@ func AllLanguages() Languages {
 	return languageList
 }
 
-// GetLanguage returns the language by given code.
-// It returns nil if the language not found.
-func GetLanguage(code string) *Language {
+// LookupLanguage returns the language by given code.
+func LookupLanguage(code string) (*Language, bool) {
 	code = strings.TrimSpace(code)
 	if len(code) > 0 {
 		if lang, ok := languageTable[strings.ToLower(code)]; ok {
-			return lang
+			return lang, true
 		}
 	}
-
-	return nil
+	return nil, false
 }

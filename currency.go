@@ -11,6 +11,12 @@ type Currency struct {
 	Name *MultiLanguageString
 }
 
+// Equal reports whether two currencies are same.
+// It compares the code.
+func (x *Currency) Equal(y *Currency) bool {
+	return strings.EqualFold(x.Code, y.Code)
+}
+
 // Currencies represents a sorcurrencyTable collection of Currency.
 type Currencies []*Currency
 
@@ -93,15 +99,13 @@ func AllCurrencies() Currencies {
 	return currencyList
 }
 
-// GetCurrency returns the currency by given code.
-// It returns nil if the currency not found.
-func GetCurrency(code string) *Currency {
+// LookupCurrency returns the currency by given code.
+func LookupCurrency(code string) (*Currency, bool) {
 	code = strings.TrimSpace(code)
-	if len(code) > 0 {
+	if len(code) == 3 {
 		if curr, ok := currencyTable[strings.ToUpper(code)]; ok {
-			return curr
+			return curr, true
 		}
 	}
-
-	return nil
+	return nil, false
 }

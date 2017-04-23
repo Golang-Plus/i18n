@@ -14,6 +14,12 @@ type Country struct {
 	Aliases     *MultiLanguageStringArray
 }
 
+// Eaual reports whether two countries are same.
+// It compares the alpha-2 code.
+func (x *Country) Equal(y *Country) bool {
+	return strings.EqualFold(x.Alpha2Code, y.Alpha2Code)
+}
+
 // Countries represents a sorcountryTable collection of Country.
 type Countries []*Country
 
@@ -92,7 +98,7 @@ func init() {
 			Alpha3Code:  alpha3Code,
 			NumericCode: numericCode,
 			Name:        NewMultiLanguageString(),
-			Aliases:     NewMultiLanguageStringArray("|"),
+			Aliases:     NewMultiLanguageStringArray(";"),
 		}
 
 		countryTableAlpha2[alpha2Code] = country
@@ -107,44 +113,42 @@ func AllCountries() Countries {
 	return countryList
 }
 
-// GetCountry returns the country by given keyword (code, name, alias with language).
-// It returns nil if the country not found.
-func GetCountry(language *Language, keyword string) *Country {
+// LookupCountry returns the country by given keyword (code, name, alias with language).
+func LookupCountry(language *Language, keyword string) (*Country, bool) {
 	keyword = strings.TrimSpace(keyword)
 	if len(keyword) == 0 {
-		return nil
+		return nil, false
 	}
-
+	// alpha-2 code
 	if len(keyword) == 2 {
 		if v, ok := countryTableAlpha2[strings.ToUpper(keyword)]; ok {
-			return v
+			return v, true
 		}
 	}
-
+	// alpha-3 & numeric code
 	if len(keyword) == 3 {
 		if v, ok := countryTableAlpha3[strings.ToUpper(keyword)]; ok {
-			return v
+			return v, true
 		}
 		if v, ok := countryTableNumeric[strings.ToUpper(keyword)]; ok {
-			return v
+			return v, true
 		}
 	}
-
+	// keyword
 	if language != nil {
 		for _, country := range countryList {
 			// compare name
 			name := country.Name.Value(language)
 			if strings.EqualFold(name, keyword) {
-				return country
+				return country, true
 			}
 
 			// compare aliases
 			aliases := country.Aliases.Value(language)
 			if strings.Contains(strings.ToLower(aliases), strings.ToLower(keyword)) {
-				return country
+				return country, true
 			}
 		}
 	}
-
-	return nil
+	return nil, false
 }
