@@ -18,8 +18,7 @@ func (mlf *MultiLanguageString) SupportedLanguages() Languages {
 	langs := make(Languages, len(mlf.Values))
 	index := 0
 	for langCode, _ := range mlf.Values {
-		lang := GetLanguage(langCode)
-		if lang != nil {
+		if lang, ok := LookupLanguage(langCode); ok {
 			langs[index] = lang
 			index += 1
 		}

@@ -16,6 +16,12 @@ type Culture struct {
 	Formatter  *Formatter
 }
 
+// Eaual reports whether two cultures are same.
+// It compares the code.
+func (x *Culture) Equal(y *Culture) bool {
+	return strings.EqualFold(x.Code, y.Code)
+}
+
 // FormatNumber formats the number to string.
 func (c *Culture) FormatNumber(number float64) string {
 	return c.Formatter.Number.Format(number)
@@ -149,16 +155,13 @@ func init() {
 		nativeName := cultureNativeNames[code]
 		countryCode := code[strings.LastIndex(code, "-")+1:]
 		languageCode := code[0:strings.Index(code, "-")]
-		country := GetCountry(nil, countryCode)
-		language := GetLanguage(languageCode)
-
+		country, _ := LookupCountry(nil, countryCode)
+		language, _ := LookupLanguage(languageCode)
 		var curr *Currency
 		if currencyCode, ok := cultureCurrencyCodes[code]; ok {
-			curr = GetCurrency(currencyCode)
+			curr, _ = LookupCurrency(currencyCode)
 		}
-
 		formatter := cultureFormatters[code]
-
 		culture := &Culture{
 			Code:       code,
 			NativeName: nativeName,
@@ -168,7 +171,6 @@ func init() {
 			Currency:   curr,
 			Formatter:  formatter,
 		}
-
 		cultureTable[strings.ToLower(code)] = culture
 		cultureList[i] = culture
 	}
@@ -179,15 +181,13 @@ func AllCultures() Cultures {
 	return cultureList
 }
 
-// GetCulture returns the culture by given code.
-// It returns nil if the culture not found.
-func GetCulture(code string) *Culture {
+// LookupCulture returns the culture by given code.
+func LookupCulture(code string) (*Culture, bool) {
 	code = strings.TrimSpace(code)
 	if len(code) > 0 {
 		if cult, ok := cultureTable[strings.ToLower(code)]; ok {
-			return cult
+			return cult, true
 		}
 	}
-
-	return nil
+	return nil, false
 }
