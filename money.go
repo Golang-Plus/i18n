@@ -136,6 +136,14 @@ func (m *Money) Exchange(currency *ExchangeableCurrency) *Money {
 	return m
 }
 
+// Cmp compares x and y and returns:
+// -1 if x < y
+//  0 if x == y (includes: -0 == 0, -Inf == -Inf, and +Inf == +Inf)
+// +1 if x > y
+func (x *Money) Cmp(y *Money) int {
+	return big.NewDecimal(x.Amount).Cmp(big.NewDecimal(new(Money).Copy(y).Exchange(x.Currency).Amount))
+}
+
 // Add sets amount to the sum of amount and x then returns m.
 func (x *Money) Add(y *Money) *Money {
 	amount := big.NewDecimal(x.Amount)
